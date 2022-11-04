@@ -1,0 +1,147 @@
+---
+title: 'Hüpoteeside testimine: praktikumieelsed ülesanded'
+author: "Indrek Soidla"
+date: '2022-10-29'
+output: 
+  html_document:
+    theme: spacelab
+    highlight: tango
+    fig_cap: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Laeme sisse ülesannete lahendamiseks vajalikud paketid ja andmed. Andmestik (ESS 2018 Eesti andmed) on Moodle's olemas.
+
+```{r message = FALSE}
+library(haven)
+library(tidyverse)
+library(weights)
+library(summarytools)
+library(TAM)
+
+ee9 <- read_spss("data/ee9.sav")
+```
+
+
+## Ülesanne 1 {.tabset .tabset-fade .tabset-pills}
+
+### Küsimus
+
+Eelmise korra esimeses praktikumieelses ülesandes leidsite, et sisserändajate majandusliku mõju hinnangutes ei saa nende vahel, kes on ise muus riigis töötanud ja kes pole, keskmiselt erinevust väita (usaldusvahemikud kattusid). Ühe grupi keskmine ei olnud teise usaldusvahemikus, aga teise grupi usaldusvahemik oli täielikult esimese grupi usaldusvahemikus. Kas t-test annab siin (olulisuse nivool 0,05) alust keskmiste erinevust väita? Kirjeldage, milliste näitajate põhjal otsuse teete. Tehke ülesanne kaalutud andmetega.
+
+### Vihje
+
+Millist *t*-testi peaks kasutama? Uurite arvulise tunnuse (hinnang sisserände majanduslikule mõjule) keskmiste erinevust kahes teineteisest sõltumatus grupis.
+
+### Vihje 2
+
+Kaalutud andmetega t-testi tegemiseks funktsiooni `wtd.t.test` abil tuleks esmalt luua kahe grupi andmestikud, mida saaks kasutada t-testi tegemise käsu argumentide puhul.
+
+### Tulemus
+
+```{r echo = FALSE}
+wrkabr_y <- ee9 %>% 
+  filter(wrkac6m == 1)
+
+wrkabr_n <- ee9 %>% 
+  filter(wrkac6m == 2)
+
+wtd.t.test(wrkabr_y$imbgeco, wrkabr_n$imbgeco, wrkabr_y$pspwght, wrkabr_n$pspwght)
+```
+
+### Lahendus
+
+```{r eval = FALSE}
+wrkabr_y <- ee9 %>% 
+  filter(wrkac6m == 1)
+
+wrkabr_n <- ee9 %>% 
+  filter(wrkac6m == 2)
+
+wtd.t.test(wrkabr_y$imbgeco, wrkabr_n$imbgeco, wrkabr_y$pspwght, wrkabr_n$pspwght)
+```
+
+## Ülesanne 2 {.tabset .tabset-fade .tabset-pills}
+
+### Küsimus
+
+Kas usaldus parlamendi vastu (trstprl) keskmiselt erineb usaldusest parteide vastu (trstprt)? Eelnev küsimus põhineb asjaolul, et Riigikogu on riiklik institutsioon, parteid kodanikualgatuslikud - kas inimesed tajuvad nende erinevust (vähemalt nende usaldamise tasandil)? 
+
+Sama võib küsida ka üksikisikute ja organisatsioonide erinevuse kohta - kas usaldus poliitikute vastu (trstplt) keskmiselt erineb usaldusest parteide vastu? 
+
+Tehke järeldused olulisuse nivool 0,01. Mida saate öelda tulemuse statilise ja sisulise olulisuse kohta?
+
+Tehke ülesanne Eesti andmetega, võtke arvesse kaalud. 
+
+Boonusosa (pole kohustuslik, ei lähe punkte maha, kui pole tehtud): püüdke ka eelnevalt hinnata, kas t-testi eeldused on täidetud (võite tunnuse jaotust ka silmaga, st graafiliselt hinnata). Kui eeldused pole täielikult täidetud, ei tähenda see veel, et t-test oleks kasutu. *T*-test on ka suhteliselt robustne oma eelduste suhtes.
+
+### Vihje
+
+Millist *t*-testi peaks siin kasutama? Ühe küsimuse kohta on kaks arvulist tunnust, tegu on paarismõõtmistega.
+
+### Vihje 2
+
+Kummagi tunnuspaari puhul tuleks arvutada iga indiviidi kohta kahe tunnuse väärtuste vahe. Seejärel saab testida vahede keskmist erinevust nullist. Enne tuleks veel uurida paariskogumite t-testi eelduste täidetust (vt järgmine vihje).
+
+### Vihje 3
+
+Paariskogumite *t*-testi eeldusena oli õppevideos ekslikult kontrollitud mõlema vaadeldava tunnuse jaotuse vastavust normaaljaotusele. Õppejõule tuli hiljem meelde, et testima oleks pidanud tegelikult tunnuste vahede jaotuse vastavust normaaljaotusele. Tehke teie kohe paremini.
+
+Eelnevast tulenevalt paariskogumite *t*-testi puhul hajuvuste sarnasust hinnata ei tule (ei saagi).
+
+### Tulemus
+
+Jaotusparameetrid t-testi eelduste täidetuse hindamiseks
+
+```{r echo = FALSE}
+ee9 <- ee9 %>% 
+  mutate(trstprl_prt = trstprl - trstprt,
+         trstplt_prt = trstplt - trstprt)
+
+weighted_skewness(ee9$trstprl_prt, w = ee9$pspwght)
+weighted_kurtosis(ee9$trstprl_prt, w = ee9$pspwght)
+weighted_skewness(ee9$trstplt_prt, w = ee9$pspwght)
+weighted_kurtosis(ee9$trstplt_prt, w = ee9$pspwght)
+```
+
+Jaotused t-testi eelduste täidetuse hindamiseks
+
+```{r echo = FALSE}
+ggplot(ee9, aes(trstprl_prt, weights = pspwght)) +
+  geom_bar()
+
+ggplot(ee9, aes(trstplt_prt, weights = pspwght)) +
+  geom_bar()
+```
+
+t-testid
+
+```{r echo = FALSE}
+wtd.t.test(ee9$trstprl_prt, 0, ee9$pspwght)
+wtd.t.test(ee9$trstplt_prt, 0, ee9$pspwght)
+```
+
+### Lahendus
+
+```{r eval = FALSE}
+ee9 <- ee9 %>% 
+  mutate(trstprl_prt = trstprl - trstprt,
+         trstplt_prt = trstplt - trstprt)
+
+weighted_skewness(ee9$trstprl_prt, w = ee9$pspwght)
+weighted_kurtosis(ee9$trstprl_prt, w = ee9$pspwght)
+weighted_skewness(ee9$trstplt_prt, w = ee9$pspwght)
+weighted_kurtosis(ee9$trstplt_prt, w = ee9$pspwght)
+
+ggplot(ee9, aes(trstprl_prt, weights = pspwght)) +
+  geom_bar()
+
+ggplot(ee9, aes(trstplt_prt, weights = pspwght)) +
+  geom_bar()
+
+wtd.t.test(ee9$trstprl_prt, 0, ee9$pspwght)
+wtd.t.test(ee9$trstplt_prt, 0, ee9$pspwght)
+```

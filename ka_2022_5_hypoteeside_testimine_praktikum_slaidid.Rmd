@@ -1,0 +1,96 @@
+---
+title: 'Hüpoteeside testimine: praktikum'
+author: "Indrek Soidla"
+date: '2022-11-03'
+output: 
+  ioslides_presentation:
+    widescreen: true
+    transition: faster
+    incremental: true
+---
+
+```{css, echo = FALSE}
+ul li {
+    font-size: 24px;
+}
+
+.smallish ul li {
+  font-size: 20px;
+}
+
+pre {
+  font-size: 12px;
+  line-height: 1.2em;
+}
+
+.valjund {
+  font-size: 12px;
+}
+
+p.caption {
+  font-size: 0.5em;
+  font-style: italic;
+}
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Miks hüpoteeside testimisega tegeleme?
+
+- Näited
+
+## Hüpoteeside testimine
+
+- Püstitame null- ja alternatiivhüpoteesi
+- Valime olulisuse nivoo $(\alpha)$
+- Valime statistilise testi
+  - valik sõltub 
+    - sellest, mida tahame testida
+    - tunnuste iseloomust
+    - testi eelduste täidetusest
+- Arvutame teststatistiku väärtuse 
+  - andmeanalüüsi programm arvutab ka muud vajalikud näitajad
+- Teeme otsuse hüpoteesipaari kohta
+
+## Hüpoteesipaari kohta otsuse tegemine I
+
+- Võimalus 1:
+- võrdleme saadud teststatistiku väärtust teststatistiku kriitilis(t)e väärtus(t)ega 
+  - millised on kriitilised väärtused, sõltub
+    - teststatistikust
+    - valitud olulisuse nivoost
+    - vabadusastmete arvust
+  - teisisõnu, kas saadud teststatistiku väärtus asub kriitilises piirkonnas
+  - kui asub, kinnitame alternatiivhüpoteesi
+  - kui ei asu, jääme nullhüpoteesi juurde
+
+## Hüpoteesipaari kohta otsuse tegemine II
+
+- Võimalus 2:
+- võrdleme teststatistiku olulisuse *tõenäosust* $(p)$ valitud olulisuse *nivooga* $(\alpha)$
+  - kui $p < \alpha$ ehk olulisuse tõenäosus on väiksem olulisuse nivoost, kinnitame alternatiivhüpoteesi
+  - kui $p \geq \alpha$, jääme nullhüpoteesi juurde
+  
+## Hüpoteesipaari kohta otsuse tegemine III
+
+- Võimalus 3(*-ish*):
+- pmst ka kolmas võimalus (enamasti küll pigem illustratiivse / sisulise tõlgenduse funktsioonis): 
+  - võrdleme teststatistiku vm testimise objektiks oleva näitaja usaldusvahemikku nullhüpoteesiga kooskõlas oleva väärtusega
+  - *t*-testi puhul, kui H0 väidab keskmiste võrdumist ehk keskmiste erinevus on null: võrdleme keskmiste erinevuse usaldusvahemikku nulliga
+    - kui keskmiste erinevuse usaldusvahemik ei kata nulli, näitab see, et saame kinnitada alternatiivhüpoteesi
+    - kui usaldusvahemik katab nulli, jääme nullhüpoteesi juurde
+
+## Mitte sassi ajada!
+
+- Olulisuse nivoo
+- Olulisuse tõenäosus
+- Usaldusnivoo
+- Usaldusvahemik
+
+## Erinevad *t*-testid
+
+- Sõltumatute kogumite *t*-test
+- Ühe kogumi *t*-test
+- Paariskogumite *t*-test
